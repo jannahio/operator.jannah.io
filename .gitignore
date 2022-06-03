@@ -1,0 +1,4 @@
+# created by virtualenv automatically
+ansible/jannah-boot/*
+jannah-boot/*
+ansible/group_vars/all
