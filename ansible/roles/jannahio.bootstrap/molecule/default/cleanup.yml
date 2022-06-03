@@ -1,0 +1,23 @@
+---
+- name: Cleanup
+  hosts: localhost
+  connection: local
+  tasks:
+    # Developer must implement.
+    - name: remove bootstrap configmap
+      k8s:
+        api_version: v1
+        kind: ConfigMap
+        name: '{{ Jannah.stages.bootstrap.conig_map.name }}'
+        namespace: '{{ Jannah.global.namespace }}'
+        state: absent
+
+    - name: 'Delete Testing Namespace'
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: '{{ Jannah.global.namespace }}'
+            namespace: '{{ Jannah.global.namespace }}'
+          state: absent

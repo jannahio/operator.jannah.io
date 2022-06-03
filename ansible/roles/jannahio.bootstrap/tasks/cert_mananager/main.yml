@@ -1,0 +1,25 @@
+---
+- name: "Cert - Manager Setup"
+  block:
+    - name: "Install cmctl"
+      shell: |
+        OS=$(go env GOOS); ARCH=$(go env GOARCH); curl -L -o cmctl.tar.gz \
+        https://github.com/jetstack/cert-manager/releases/latest/download/cmctl-$OS-$ARCH.tar.gz
+        tar xzf cmctl.tar.gz
+        mv cmctl /usr/local/bin
+      async: 600
+      poll: 5
+      tags:
+        - "d1d2-bootstrap-infra-cert-mgr"
+        - "d1d2-operator"
+    
+    - name: "cmctl x install"
+      shell: |
+        export KUBECONFIG='{{ Jannah.credentials[1].kubeconfig }}'
+        cmctl x install
+      async: 600
+      poll: 5
+      register: cmctl_x_install_results
+      tags:
+        - "d1d2-bootstrap-infra-cert-mgr"
+        - "d1d2-operator"

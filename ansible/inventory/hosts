@@ -1,0 +1,2 @@
+[development]
+localhost  ../../jannah-boot/bin/python3.9  ansible_connection=local

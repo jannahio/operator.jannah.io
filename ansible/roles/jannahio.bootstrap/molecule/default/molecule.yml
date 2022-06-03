@@ -1,0 +1,68 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+lint: |
+  set -e
+  yamllint -d "{extends: relaxed, rules: {line-length: {max: 120}}}" .
+platforms:
+  - name: cluster
+    groups:
+      - k8s
+provisioner:
+  name: ansible
+  lint: |
+    set -e
+    ansible-lint
+  inventory:
+    group_vars:
+      all:
+        namespace: ${TEST_OPERATOR_NAMESPACE:-jannah-osdk-test}
+        Jannah:
+          global:
+            namespace: ${TEST_OPERATOR_NAMESPACE:-jannah-osdk-test}
+          credentials:
+            github:
+              GITHUB_USERNAME:
+              GITHUB_TOKEN:
+            k8:
+              namespace: jannah-operator-bootstrap
+              kubeconfig: /Users/osmanj/dev/runtime/01252022/logs/integration0125/kube_config_whelp-gke-integration0125-1cf.yaml
+              state: present
+              ClusterIssuer:
+                name: jannah-operator-issuer
+              Issuer:
+                name: jannah-operator-ca-issuer
+              Certificate:
+                name: jannah-operator-cert
+                commonName: operator.jannah.io
+                secretName: jannah-operator-sc
+            dockerhub:
+              url: https://index.docker.io/v1/
+              USERNAME: 'osman.jalloh@netapp.com'
+              PASSWORD: ''
+              EMAIL: 'osman.jalloh@netapp.com'
+          stages:
+            day1day2:
+              sub_dir:
+            bootstrap:
+              conig_map:
+                name: bootstrap-config
+                apiVersion: v1
+                data:
+                  phase: bootstrap
+              secrets:
+                image_registry:
+                  name: regcred
+                  apiVersion: v1
+    host_vars:
+      localhost:
+        name: osmanj-mac-0
+  env:
+    K8S_AUTH_KUBECONFIG: ${KUBECONFIG:-"~/.kube/config"}
+verifier:
+  name: ansible
+  lint: |
+    set -e
+    ansible-lint

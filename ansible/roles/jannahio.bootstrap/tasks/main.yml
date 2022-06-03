@@ -1,0 +1,31 @@
+---
+- name: "Bootstrapping Playbooks"
+  block:
+    # Import the bootrapping roles
+    - name: Import bootstrap tasks/
+      include_tasks: '{{ item }}'
+      with_fileglob:
+#        - namespaces/main.yml
+        - secrets/main.yml
+#        - build_operator/main.yml
+      tags:
+        - "bootstrap_jannah_namespace"
+        - "bootstrap_olm_install"
+        - "bootstrap_olm_status"
+        - "bootstrap_make_bundle"
+        - "bootstrap_docker_secrets"
+        - "bootstrap_patch_serviceaccount_secrets"
+        - "bootstrap_get_serviceaccount_file"
+        - "bootstrap_comment_out_resourceVersion"
+        - "bootstrap_replace_serviceaccount"
+        - "bootstrap_docker_root_cert_secret"
+  rescue:
+    - name: "An exception is thrown"
+      ansible.builtin.debug:
+        msg: 'Bootstrap failed'
+  always:
+    - name: "Handle exception"
+      ansible.builtin.debug:
+        msg: 'Bootstrap done'
+  ignore_errors: false
+

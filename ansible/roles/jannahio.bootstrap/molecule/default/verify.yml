@@ -1,0 +1,19 @@
+---
+- name: Verify
+  hosts: localhost
+  connection: local
+  tasks:
+    - debug: var=bootstrap_cm
+      vars:
+        bootstrap_cm: '{{ lookup("kubernetes.core.k8s", api_version="v1", kind="ConfigMap", namespace=namespace, resource_name="bootstrap-config") }}'
+    - debug: var=image_registry_cm
+      vars:
+        image_registry_cm: '{{ lookup("kubernetes.core.k8s", api_version="v1", kind="Secret", namespace=namespace, resource_name="regcred") }}'
+    - assert:
+        that: bootstrap_cm.data.phase == 'bootstrap'
+      vars:
+        bootstrap_cm: '{{ lookup("kubernetes.core.k8s", api_version="v1", kind="ConfigMap", namespace=namespace, resource_name="bootstrap-config") }}'
+    - assert:
+        that: image_registry_cm.metadata.name == 'regcred'
+      vars:
+        image_registry_cm: '{{ lookup("kubernetes.core.k8s", api_version="v1", kind="Secret", namespace=namespace, resource_name="regcred") }}'

@@ -1,0 +1,33 @@
+---
+- name: "Build Operator Image"
+  tags: bootstrap_build_prereqs
+  block:
+    - name: "install olm"
+      shell: |
+        operator-sdk olm uninstall
+        operator-sdk olm install
+      tags:
+        - "bootstrap_olm_install"
+      async: 600
+      poll: 5
+      register: olm_install_results
+
+    - name: "check olm status"
+      shell: |
+        operator-sdk olm status
+      tags:
+        - "bootstrap_olm_status"
+      async: 600
+      poll: 5
+      register: bootstrap_olm_status
+
+    - name: "make bundle"
+      shell: |
+        make bundle BUNDLE_IMG={{ Jannah.stages.bootstrap.build.BUNDLE_IMG }}
+      args:
+        chdir: "operators/ansible_based/jannah-operator"
+      tags:
+        - "bootstrap_make_bundle"
+      async: 600
+      poll: 5
+      register: bootstrap_make_bundle
